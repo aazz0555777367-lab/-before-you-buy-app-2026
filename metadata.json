@@ -1,0 +1,6 @@
+{
+  "name": "قبل تشتري | Before You Buy",
+  "description": "مساعد الشراء الذكي لاتخاذ قرارات الشراء الصحيحة بالذكاء الاصطناعي ومقارنة الأسعار وكشف المراجعات المضللة.",
+  "requestFramePermissions": ["camera"],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
