@@ -31,7 +31,6 @@ jobs:
 
       - name: Check iOS files
         run: |
-          echo "Checking iOS project files..."
           find ios -maxdepth 4 -type f \( -name "*.xcodeproj" -o -name "*.xcworkspace" \) -print
 
       - name: Set up Xcode
@@ -39,17 +38,10 @@ jobs:
         with:
           xcode-version: latest-stable
 
-      - name: Check Xcode
-        run: |
-          xcodebuild -version
-          xcode-select -p
-
       - name: Build Xcode Project
         run: |
           if [ -f "ios/App/App.xcworkspace/contents.xcworkspacedata" ]; then
-            echo "Using App.xcworkspace"
             cd ios/App
-
             xcodebuild \
               -workspace App.xcworkspace \
               -scheme App \
@@ -61,9 +53,7 @@ jobs:
               CODE_SIGNING_REQUIRED=NO
 
           elif [ -f "ios/App/App.xcodeproj/project.pbxproj" ]; then
-            echo "Using App.xcodeproj"
             cd ios/App
-
             xcodebuild \
               -project App.xcodeproj \
               -scheme App \
