@@ -44,4 +44,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: BeforeYouBuy-iOS-Archive
-          path: ios/App/App.xcarchive
+          path: ios/App/App.xcarchive 
