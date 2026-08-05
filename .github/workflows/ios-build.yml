@@ -38,6 +38,11 @@ jobs:
         with:
           xcode-version: latest-stable
 
+      - name: Check Xcode
+        run: |
+          xcodebuild -version
+          xcode-select -p
+
       - name: Build Xcode Project
         run: |
           if [ -f "ios/App/App.xcworkspace/contents.xcworkspacedata" ]; then
