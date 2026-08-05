@@ -34,7 +34,11 @@ jobs:
         with:
           xcode-version: latest-stable
 
-      - name: Build iOS
+      - name: Find iOS project
+        run: |
+          find ios -maxdepth 3 \( -name "*.xcworkspace" -o -name "*.xcodeproj" \) -print
+
+      - name: Build iOS Archive
         run: |
           cd ios/App
 
@@ -44,7 +48,7 @@ jobs:
               -scheme App \
               -configuration Release \
               -destination 'generic/platform=iOS' \
-              -archivePath App.xcarchive \
+              -archivePath "$GITHUB_WORKSPACE/App.xcarchive" \
               archive \
               CODE_SIGNING_ALLOWED=NO \
               CODE_SIGNING_REQUIRED=NO
@@ -54,7 +58,7 @@ jobs:
               -scheme App \
               -configuration Release \
               -destination 'generic/platform=iOS' \
-              -archivePath App.xcarchive \
+              -archivePath "$GITHUB_WORKSPACE/App.xcarchive" \
               archive \
               CODE_SIGNING_ALLOWED=NO \
               CODE_SIGNING_REQUIRED=NO
@@ -62,10 +66,13 @@ jobs:
 
       - name: Create IPA
         run: |
-          mkdir -p Payload
-          cp -R ios/App/App.xcarchive/Products/Applications/App.app Payload/
-          zip -r BeforeYouBuy.ipa Payload
-          rm -rf Payload
+          rm -rf Payload BeforeYouBuy.ipa
+          mkdir Payload
+          cp -R App.xcarchive/Products/Applications/App.app Payload/App.app
+          /usr/bin/zip -qry BeforeYouBuy.ipa Payload
+
+          echo "IPA created:"
+          ls -lh BeforeYouBuy.ipa
 
       - name: Upload IPA
         uses: actions/upload-artifact@v4
