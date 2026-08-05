@@ -34,11 +34,7 @@ jobs:
         with:
           xcode-version: latest-stable
 
-      - name: Find iOS project
-        run: |
-          find ios -maxdepth 3 \( -name "*.xcworkspace" -o -name "*.xcodeproj" \) -print
-
-      - name: Build iOS Archive
+      - name: Build iOS
         run: |
           cd ios/App
 
@@ -69,9 +65,7 @@ jobs:
           rm -rf Payload BeforeYouBuy.ipa
           mkdir Payload
           cp -R App.xcarchive/Products/Applications/App.app Payload/App.app
-          /usr/bin/zip -qry BeforeYouBuy.ipa Payload
-
-          echo "IPA created:"
+          zip -qry BeforeYouBuy.ipa Payload
           ls -lh BeforeYouBuy.ipa
 
       - name: Upload IPA
@@ -80,3 +74,4 @@ jobs:
           name: BeforeYouBuy-iOS-IPA
           path: BeforeYouBuy.ipa
           if-no-files-found: error
+          retention-days: 7
