@@ -1,4 +1,4 @@
-name: Build iOS App Store Package
+name: Build iOS IPA
 
 on:
   push:
@@ -10,10 +10,10 @@ jobs:
     runs-on: macos-latest
 
     steps:
-      - name: Checkout repository
+      - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup Node.js
+      - name: Setup Node
         uses: actions/setup-node@v4
         with:
           node-version: 22
@@ -21,32 +21,24 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      - name: Build web application
+      - name: Build web app
         run: npm run build
 
-      - name: Initialize & Sync Capacitor iOS
+      - name: Setup Capacitor
         run: |
           npx cap add ios || true
           npx cap sync ios
 
-      - name: Check iOS files
-        run: |
-          find ios -maxdepth 4 -type f \( -name "*.xcodeproj" -o -name "*.xcworkspace" \) -print
-
-      - name: Set up Xcode
+      - name: Setup Xcode
         uses: maxim-lobanov/setup-xcode@v1
         with:
           xcode-version: latest-stable
 
-      - name: Check Xcode
+      - name: Build iOS
         run: |
-          xcodebuild -version
-          xcode-select -p
+          cd ios/App
 
-      - name: Build Xcode Project
-        run: |
-          if [ -f "ios/App/App.xcworkspace/contents.xcworkspacedata" ]; then
-            cd ios/App
+          if [ -f "App.xcworkspace/contents.xcworkspacedata" ]; then
             xcodebuild \
               -workspace App.xcworkspace \
               -scheme App \
@@ -56,9 +48,7 @@ jobs:
               archive \
               CODE_SIGNING_ALLOWED=NO \
               CODE_SIGNING_REQUIRED=NO
-
-          elif [ -f "ios/App/App.xcodeproj/project.pbxproj" ]; then
-            cd ios/App
+          else
             xcodebuild \
               -project App.xcodeproj \
               -scheme App \
@@ -68,25 +58,18 @@ jobs:
               archive \
               CODE_SIGNING_ALLOWED=NO \
               CODE_SIGNING_REQUIRED=NO
-
-          else
-            echo "ERROR: No Xcode project or workspace was found."
-            find ios -maxdepth 4 -print
-            exit 1
           fi
 
-      - name: Check Archive
+      - name: Create IPA
         run: |
-          if [ -d "ios/App/App.xcarchive" ]; then
-            echo "SUCCESS: App.xcarchive was created."
-          else
-            echo "ERROR: App.xcarchive was not created."
-            exit 1
-          fi
+          mkdir -p Payload
+          cp -R ios/App/App.xcarchive/Products/Applications/App.app Payload/
+          zip -r BeforeYouBuy.ipa Payload
+          rm -rf Payload
 
-      - name: Upload Xcode Archive Artifact
+      - name: Upload IPA
         uses: actions/upload-artifact@v4
         with:
-          name: BeforeYouBuy-iOS-Archive
-          path: ios/App/App.xcarchive
+          name: BeforeYouBuy-iOS-IPA
+          path: BeforeYouBuy.ipa
           if-no-files-found: error
